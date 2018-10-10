@@ -115,18 +115,19 @@ const attemptMove = (m, y, x, d, n, moves) => {
 };
 
 const collapseBoard = (m) => {
-  const mt = transpose(m);
-  let mw = [];
-  mt.forEach((line) => {
-    mw.push(line.join('')
-      .replace(/[^BYGPRO]/g, '')
-      .padStart(6, EMPTY)
-      .split(''));
+  m = transpose(m);
+  m.forEach((line) => {
+    line.splice(0,
+      line.length,
+      ...line.join('')
+        .replace(/[^BYGPRO]/g, '')
+        .padStart(line.length, EMPTY)
+        .split(''));
   });
-  mw = transpose(mw);
-  const matches = findMatches(mw); // cascade clear support
-  if (matches.length) return removeMatches(mw, matches);
-  return mw;
+  m = transpose(m);
+  const matches = findMatches(m); // cascade clear support
+  if (matches.length) return removeMatches(m, matches);
+  return m;
 };
 
 const removeMatches = (m, matches) => {
