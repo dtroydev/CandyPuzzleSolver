@@ -115,14 +115,18 @@ const attemptMove = (m, y, x, d, n, moves) => {
 };
 
 const collapseBoard = (m) => {
-  const [mt, mw] = [transpose(m), []];
+  const mt = transpose(m);
+  let mw = [];
   mt.forEach((line) => {
     mw.push(line.join('')
       .replace(/[^BYGPRO]/g, '')
       .padStart(6, EMPTY)
       .split(''));
   });
-  return transpose(mw);
+  mw = transpose(mw);
+  const matches = findMatches(mw); // cascade clear support
+  if (matches.length) return removeMatches(mw, matches);
+  return mw;
 };
 
 const removeMatches = (m, matches) => {
@@ -158,9 +162,10 @@ const findMoves = (m, n, moves) => {
     });
   });
 };
-
+let total = 0;
 const treeToArray = (moves) => {
   if (moves.children.length === 0) {
+    total += 1;
     if (moves.node.length === FILTER.length && moves.boardCleared === true) {
       boardClearingMoves.push(moves.node.join(' '));
     }
@@ -176,5 +181,5 @@ const movesTree = new MOVES();
 const boardClearingMoves = [];
 console.log(`${timed(findMoves, BOARD, FILTER.length, movesTree)}`);
 treeToArray(movesTree);
-console.log(`\n${boardClearingMoves.length} solutions\n`);
+console.log(`\n${boardClearingMoves.length} solutions out of ${total} possible move sets\n`);
 boardClearingMoves.forEach(m => console.log(m));
