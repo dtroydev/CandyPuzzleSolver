@@ -162,12 +162,16 @@ const findMoves = (m, n, moves) => {
     });
   });
 };
+
 let total = 0;
+
 const treeToArray = (moves) => {
   if (moves.children.length === 0) {
-    total += 1;
-    if (moves.node.length === FILTER.length && moves.boardCleared === true) {
-      boardClearingMoves.push(moves.node.join(' '));
+    if (moves.node.length === FILTER.length) {
+      total += 1;
+      if (moves.boardCleared === true) {
+        boardClearingMoves.push(moves.node.join(' '));
+      }
     }
   } else { // tree is mutated since it won't be needed later
     moves.children.forEach((n) => {
