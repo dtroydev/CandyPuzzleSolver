@@ -103,11 +103,9 @@ const attemptMove = (m, y, x, d, n, moves) => {
   if (!FILTERENABLED || MOVE.match(FILTER[FILTER.length - n])) {
     if (swap(m, y, x, d)) {
       const matches = findMatches(m);
-      if (matches.length) {
-        const child = moves.add(MOVE);
-        let m2 = deepCopy(m);
-        m2 = removeMatches(m2, matches);
-        findMoves(m2, n - 1, child);
+      if (matches.length) { // make child board for recursion
+        const m2 = removeMatches(deepCopy(m), matches);
+        findMoves(m2, n - 1, moves.add(MOVE));
       }
       swap(m, y, x, d + 1);
     }
@@ -166,25 +164,25 @@ const findMoves = (m, n, moves) => {
 
 let total = 0;
 
-const treeToArray = (moves) => {
+const treeToArray = (moves, arr) => {
   if (moves.children.length === 0) {
     if (moves.node.length === FILTER.length) {
       total += 1;
       if (moves.boardCleared === true) {
-        boardClearingMoves.push(moves.node.join(' '));
+        arr.push(moves.node.join(' '));
       }
     }
   } else { // tree is mutated since it won't be needed later
     moves.children.forEach((n) => {
       n.node.unshift(...moves.node);
-      treeToArray(n);
+      treeToArray(n, arr);
     });
   }
+  return arr;
 };
 
 const movesTree = new MOVES();
-const boardClearingMoves = [];
 console.log(`${timed(findMoves, BOARD, FILTER.length, movesTree)}`);
-treeToArray(movesTree);
+const boardClearingMoves = treeToArray(movesTree, []); // must follow findMoves
 console.log(`\n${boardClearingMoves.length} solutions out of ${total} possible move sets\n`);
 boardClearingMoves.forEach(m => console.log(m));
